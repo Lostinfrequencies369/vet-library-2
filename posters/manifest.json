@@ -1,21 +1,17 @@
 ﻿{
-    "generated":  "2026-01-27T20:17:57",
-    "count":  2,
-    "items":  [
-                  {
-                      "category":  "skin",
-                      "file":  "posters/skin/macrocyclic-lactones-avermectins-milbemycins.jpg",
-                      "title":  "macrocyclic-lactones-avermectins-milbemycins"
-                  },
-                  {
-                      "category":  "skin",
-                      "file":  "posters/skin/zinc-responsive-dermatosis.jpg",
-                      "title":  "zinc-responsive-dermatosis"
-                  }
-              ]
-}
-{
+  "generated": "2026-01-27T20:17:57",
+  "count": 3,
   "items": [
+    {
+      "category": "skin",
+      "file": "posters/skin/macrocyclic-lactones-avermectins-milbemycins.jpg",
+      "title": "macrocyclic-lactones-avermectins-milbemycins"
+    },
+    {
+      "category": "skin",
+      "file": "posters/skin/zinc-responsive-dermatosis.jpg",
+      "title": "zinc-responsive-dermatosis"
+    },
     {
       "title": "Respiratory Acidosis and Alkalosis",
       "category": "respiratory",
@@ -24,4 +20,3 @@
     }
   ]
 }
-
