@@ -14,3 +14,14 @@
                   }
               ]
 }
+{
+  "items": [
+    {
+      "title": "Respiratory Acidosis and Alkalosis",
+      "category": "respiratory",
+      "file": "posters/respiratory/Respiratory-acidosis-alkalosis.jpg",
+      "tags": ["respiratory", "acidosis", "alkalosis"]
+    }
+  ]
+}
+
