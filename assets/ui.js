@@ -17,7 +17,6 @@ function norm(s){
 }
 
 function prettySection(id){
-  // folder name -> readable label
   const m = {
     "fish_aquatics":"Fish & Aquatics",
     "eye-ear":"Eye & Ear",
@@ -26,8 +25,7 @@ function prettySection(id){
   };
   if (m[id]) return m[id];
 
-  // Title Case with spacing
-  return id
+  return (id || "")
     .replace(/[_-]+/g, " ")
     .split(" ")
     .filter(Boolean)
@@ -37,53 +35,74 @@ function prettySection(id){
 
 /* ---------------- Page transitions ---------------- */
 function showPage(n){
-  $("page1").classList.toggle("hidden", n !== 1);
-  $("page2").classList.toggle("hidden", n !== 2);
-  $("page3").classList.toggle("hidden", n !== 3);
+  const p1 = $("page1"), p2 = $("page2"), p3 = $("page3");
+  if(!p1 || !p2 || !p3){
+    console.error("Missing page containers: #page1/#page2/#page3");
+    return;
+  }
+  p1.classList.toggle("hidden", n !== 1);
+  p2.classList.toggle("hidden", n !== 2);
+  p3.classList.toggle("hidden", n !== 3);
 }
 
 function setProgress(p){
+  const bar = $("barFill");
+  const pctEl = $("pct");
+  if(!bar || !pctEl) return;
+
   const pct = Math.max(0, Math.min(100, Math.round(p)));
-  $("barFill").style.width = pct + "%";
-  $("pct").textContent = pct + "%";
+  bar.style.width = pct + "%";
+  pctEl.textContent = pct + "%";
 }
 
 /* ---------------- Drawer ---------------- */
 function openDrawer(){
-  $("drawer").classList.remove("hidden");
-  $("drawer").setAttribute("aria-hidden", "false");
+  const d = $("drawer");
+  if(!d) return;
+  d.classList.remove("hidden");
+  d.setAttribute("aria-hidden", "false");
 }
 function closeDrawer(){
-  $("drawer").classList.add("hidden");
-  $("drawer").setAttribute("aria-hidden", "true");
+  const d = $("drawer");
+  if(!d) return;
+  d.classList.add("hidden");
+  d.setAttribute("aria-hidden", "true");
 }
 
 /* ---------------- Modal ---------------- */
 function openModal(item){
+  const modal = $("modal");
+  const titleEl = $("modalTitle");
+  const img = $("modalImg");
+  const full = $("fullOpen");
+  if(!modal || !titleEl || !img || !full) return;
+
   const title = `${prettySection(item.category)} • ${norm(item.title)}`;
-  $("modalTitle").textContent = title;
+  titleEl.textContent = title;
 
-  const src = "./" + item.file; // item.file is like posters/skin/abc.jpg
-  $("modalImg").src = src;
-  $("modalImg").alt = item.title;
-  $("fullOpen").href = src;
+  const src = "./" + item.file;
+  img.src = src;
+  img.alt = item.title || "poster";
+  full.href = src;
 
-  $("modal").classList.remove("hidden");
+  modal.classList.remove("hidden");
 }
 function closeModal(){
-  $("modal").classList.add("hidden");
-  $("modalImg").src = "";
+  const modal = $("modal");
+  const img = $("modalImg");
+  if(!modal) return;
+  modal.classList.add("hidden");
+  if(img) img.src = "";
 }
 
 /* ---------------- Data loading (Page 2 logic) ---------------- */
 async function fetchJSON(url){
   const r = await fetch(url, { cache: "no-store" });
-  if(!r.ok) throw new Error("Fetch failed: " + url);
+  if(!r.ok) throw new Error("Fetch failed: " + url + " (" + r.status + ")");
   return r.json();
 }
 
 async function loadAll(){
-  // Show loading page
   showPage(2);
   setProgress(0);
 
@@ -96,13 +115,12 @@ async function loadAll(){
 
   const ts = Date.now();
   const manifestURL = `./posters/manifest.json?ts=${ts}&v=${encodeURIComponent(state.ver)}`;
-  const dataURL = `./data.json?ts=${ts}&v=${encodeURIComponent(state.ver)}`;
+  const dataURL     = `./data.json?ts=${ts}&v=${encodeURIComponent(state.ver)}`;
 
   try{
-    // Load both (data.json may be blank, but should be valid JSON)
     const [manifest, data] = await Promise.all([
       fetchJSON(manifestURL),
-      fetchJSON(dataURL).catch(() => ({ items: [] })) // if missing, keep safe
+      fetchJSON(dataURL).catch(() => ({ items: [] }))
     ]);
 
     state.manifest = manifest;
@@ -111,7 +129,6 @@ async function loadAll(){
     clearInterval(fakeTimer);
     setProgress(100);
 
-    // polish pause 200–300ms
     setTimeout(() => {
       initLibraryUI();
       showPage(3);
@@ -120,8 +137,8 @@ async function loadAll(){
   }catch(err){
     clearInterval(fakeTimer);
     setProgress(100);
-    console.error(err);
-    // fallback: still go to page3 but show message
+    console.error("Load error:", err);
+
     setTimeout(() => {
       initLibraryUI(true);
       showPage(3);
@@ -135,18 +152,18 @@ function buildSections(items){
   for(const it of items){
     counts.set(it.category, (counts.get(it.category) || 0) + 1);
   }
-  const sections = Array.from(counts.entries())
+  return Array.from(counts.entries())
     .map(([id, count]) => ({ id, label: prettySection(id), count }))
     .sort((a,b) => a.label.localeCompare(b.label));
-
-  return sections;
 }
 
 function renderDrawer(sections){
   const host = $("sectionList");
+  if(!host) return;
+
   host.innerHTML = "";
 
-  // "All"
+  // All Sections
   const allCount = (state.manifest?.items?.length || 0);
   const allBtn = document.createElement("button");
   allBtn.className = "secBtn" + (state.activeSection === "ALL" ? " active" : "");
@@ -172,11 +189,11 @@ function renderDrawer(sections){
 function selectSection(id){
   state.activeSection = id;
 
-  // ✅ Your requirement: selecting section clears search
+  // Requirement: selecting section clears search
   state.search = "";
-  $("search").value = "";
+  const searchEl = $("search");
+  if(searchEl) searchEl.value = "";
 
-  // Update drawer active highlight
   renderDrawer(buildSections(state.manifest?.items || []));
 
   closeDrawer();
@@ -185,6 +202,7 @@ function selectSection(id){
 
 function renderGrid(items){
   const grid = $("grid");
+  if(!grid) return;
   grid.innerHTML = "";
 
   for(const it of items){
@@ -196,7 +214,7 @@ function renderGrid(items){
     img.className = "thumb";
     img.loading = "lazy";
     img.src = "./" + it.file;
-    img.alt = it.title;
+    img.alt = it.title || "poster";
 
     const meta = document.createElement("div");
     meta.className = "meta";
@@ -221,7 +239,6 @@ function renderGrid(items){
 
 function applyFilters(){
   const all = state.manifest?.items || [];
-
   const q = norm(state.search);
   const sec = state.activeSection;
 
@@ -232,56 +249,74 @@ function applyFilters(){
     return norm(it.title).includes(q) || norm(it.file).includes(q) || norm(it.category).includes(q);
   });
 
-  // Heading
-  if(sec === "ALL"){
-    $("sectionHeading").textContent = "All Sections";
-  }else{
-    $("sectionHeading").textContent = prettySection(sec);
-  }
-  $("sectionCount").textContent = `${filtered.length} poster(s)`;
+  const heading = $("sectionHeading");
+  const countEl = $("sectionCount");
 
-  // Grid
+  if(heading){
+    heading.textContent = (sec === "ALL") ? "All Sections" : prettySection(sec);
+  }
+  if(countEl){
+    countEl.textContent = `${filtered.length} poster(s)`;
+  }
+
   renderGrid(filtered);
 
-  $("empty").classList.toggle("hidden", filtered.length !== 0);
+  const empty = $("empty");
+  if(empty){
+    empty.classList.toggle("hidden", filtered.length !== 0);
+  }
 }
 
 function initLibraryUI(showError = false){
-  // Attach handlers
-  $("menuBtn").onclick = openDrawer;
-  $("closeDrawer").onclick = closeDrawer;
-  $("drawerBackdrop").onclick = closeDrawer;
+  // Attach handlers safely
+  const menuBtn = $("menuBtn");
+  const closeBtn = $("closeDrawer");
+  const backdrop = $("drawerBackdrop");
 
-  $("modalClose").onclick = closeModal;
-  $("modalBackdrop").onclick = closeModal;
+  if(menuBtn) menuBtn.onclick = openDrawer;
+  if(closeBtn) closeBtn.onclick = closeDrawer;
+  if(backdrop) backdrop.onclick = closeDrawer;
+
+  const modalClose = $("modalClose");
+  const modalBackdrop = $("modalBackdrop");
+
+  if(modalClose) modalClose.onclick = closeModal;
+  if(modalBackdrop) modalBackdrop.onclick = closeModal;
+
   document.addEventListener("keydown", (e) => {
     if(e.key === "Escape"){ closeModal(); closeDrawer(); }
   });
 
-  $("search").addEventListener("input", () => {
-    state.search = $("search").value;
-    applyFilters();
-  });
+  const searchEl = $("search");
+  if(searchEl){
+    searchEl.addEventListener("input", () => {
+      state.search = searchEl.value;
+      applyFilters();
+    });
+  }
 
-  // If manifest missing → show empty message
   const items = state.manifest?.items || [];
   if(!items.length){
-    $("sectionHeading").textContent = "Poster Library";
-    $("sectionCount").textContent = showError ? "manifest.json missing or failed to load" : "0 poster(s)";
-    $("empty").classList.remove("hidden");
-    $("empty").textContent = showError
-      ? "manifest.json missing/failed. Generate posters/manifest.json and push."
-      : "No posters found.";
-    $("grid").innerHTML = "";
-    $("drawer").classList.add("hidden");
+    const heading = $("sectionHeading");
+    const countEl = $("sectionCount");
+    const empty = $("empty");
+    const grid = $("grid");
+
+    if(heading) heading.textContent = "Poster Library";
+    if(countEl) countEl.textContent = showError ? "manifest.json missing or failed to load" : "0 poster(s)";
+    if(empty){
+      empty.classList.remove("hidden");
+      empty.textContent = showError
+        ? "manifest.json missing/failed. Generate posters/manifest.json and push."
+        : "No posters found.";
+    }
+    if(grid) grid.innerHTML = "";
     return;
   }
 
-  // Build sections + drawer
   const sections = buildSections(items);
   renderDrawer(sections);
 
-  // Default view
   state.activeSection = "ALL";
   state.search = "";
   applyFilters();
@@ -289,16 +324,30 @@ function initLibraryUI(showError = false){
 
 /* ---------------- Page 1 -> Page 2 -> Page 3 flow ---------------- */
 function initLanding(){
-  $("enterBtn").addEventListener("click", () => {
-    // smooth switch: page1 -> page2 (not instant vanish feel)
-    $("enterBtn").blur();
-    setTimeout(() => {
-      loadAll();
-    }, 120);
+  const btn = $("enterBtn");
+  if(!btn){
+    console.error("Missing #enterBtn on page1. Check index.html.");
+    return;
+  }
+
+  // Prevent double-attach
+  if(btn.dataset.bound === "1") return;
+  btn.dataset.bound = "1";
+
+  btn.addEventListener("click", () => {
+    btn.blur();
+    setTimeout(() => loadAll(), 120);
   });
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+function boot(){
   initLanding();
   showPage(1);
-});
+}
+
+// If DOM already loaded (because ui.js injected late), run immediately
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", boot);
+} else {
+  boot();
+}
