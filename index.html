@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+  <title>Vet Library</title>
+  <meta name="theme-color" content="#06101d" />
+
+  <!-- BOOTSTRAP: cache-safe load CSS/JS using version.json -->
+  <script>
+    (async () => {
+      const bust = Date.now();
+      let v = bust;
+      try {
+        const r = await fetch('./version.json?ts=' + bust, { cache: 'no-store' });
+        if (r.ok) {
+          const j = await r.json();
+          if (j && (j.v || j.v === 0)) v = j.v;
+        }
+      } catch (e) {}
+
+      // Inject CSS
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = './assets/style.css?v=' + encodeURIComponent(v);
+      document.head.appendChild(link);
+
+      // Inject JS
+      const s = document.createElement('script');
+      s.src = './assets/ui.js?v=' + encodeURIComponent(v);
+      s.defer = true;
+      document.head.appendChild(s);
+
+      // expose version for ui.js
+      window.__VER__ = v;
+    })();
+  </script>
+</head>
+
+<body>
+  <!-- ✅ PAGE 1 — LANDING / WELCOME -->
+  <section id="page1" class="page page1">
+    <div class="bg">
+      <div class="glow glowTL"></div>
+      <div class="glow glowBR"></div>
+      <div class="grid"></div>
+      <div class="scanlines"></div>
+      <div class="vignette"></div>
+    </div>
+
+    <div class="hero">
+      <div class="badge">VET KNOWLEDGE NODE</div>
+
+      <h1 class="title rise">VET LIBRARY</h1>
+      <div class="subtitle rise">INFOGRAPHICS DIRECTORY</div>
+      <div class="by rise">Designed by <span>AM</span></div>
+
+      <button id="enterBtn" class="btn3d rise" type="button">
+        Tap to Enter Library
+      </button>
+
+      <div class="hint">Mobile-first • Search • Organ/System-wise</div>
+    </div>
+  </section>
+
+  <!-- ✅ PAGE 2 — LOADING / INITIALIZING -->
+  <section id="page2" class="page page2 hidden">
+    <div class="bg">
+      <div class="glow glowTL"></div>
+      <div class="glow glowBR"></div>
+      <div class="grid"></div>
+      <div class="scanlines"></div>
+      <div class="vignette"></div>
+    </div>
+
+    <div class="loaderPanel">
+      <div class="loaderTitle">Initializing Vet Library…</div>
+
+      <div class="barWrap">
+        <div id="barFill" class="barFill" style="width:0%"></div>
+      </div>
+
+      <div id="pct" class="pct">0%</div>
+
+      <div class="pulseWrap">
+        <div class="pulseLine"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ✅ PAGE 3 — LIBRARY / MAIN APP -->
+  <section id="page3" class="page page3 hidden">
+    <!-- Topbar -->
+    <header class="topbar">
+      <button id="menuBtn" class="iconBtn" type="button" aria-label="Open menu">☰</button>
+
+      <div class="brandStack">
+        <div class="brand1">Vet Library</div>
+        <div class="brand2">Infographics</div>
+      </div>
+
+      <div class="searchWrap">
+        <input id="search" class="search" type="search" placeholder="Search any disease/keyword…" autocomplete="off" />
+      </div>
+    </header>
+
+    <!-- Drawer -->
+    <aside id="drawer" class="drawer hidden" aria-hidden="true">
+      <div class="drawerPanel">
+        <div class="drawerHead">
+          <div class="drawerTitle">Sections</div>
+          <button id="closeDrawer" class="iconBtn" type="button" aria-label="Close menu">✕</button>
+        </div>
+
+        <div id="sectionList" class="sectionList"></div>
+      </div>
+      <div id="drawerBackdrop" class="drawerBackdrop"></div>
+    </aside>
+
+    <!-- Main content -->
+    <main class="main">
+      <div class="mainHead">
+        <div id="sectionHeading" class="sectionHeading">All Sections</div>
+        <div id="sectionCount" class="sectionCount">—</div>
+      </div>
+
+      <div id="grid" class="cardsGrid"></div>
+      <div id="empty" class="empty hidden">No posters found.</div>
+    </main>
+  </section>
+
+  <!-- Modal Viewer -->
+  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modalCard">
+      <div class="modalHead">
+        <div id="modalTitle" class="modalTitle">Poster</div>
+        <button id="modalClose" class="iconBtn" type="button" aria-label="Close">✕</button>
+      </div>
+      <div class="modalBody">
+        <img id="modalImg" alt="" />
+      </div>
+      <div class="modalFoot">
+        <a id="fullOpen" class="linkBtn" target="_blank" rel="noopener">Open Full Image</a>
+      </div>
+    </div>
+    <div id="modalBackdrop" class="modalBackdrop"></div>
+  </div>
+</body>
+</html>
