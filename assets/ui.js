@@ -3,13 +3,14 @@ const $ = (id) => document.getElementById(id);
 const state = {
   ver: (window.__VER__ ?? Date.now()),
   manifest: null,
-  data: null,            // future: data.json drug/disease index
+  data: null,
   activeSection: "ALL",
   search: ""
 };
 
 function norm(s){
   return (s || "")
+    .toString()
     .toLowerCase()
     .replace(/[_-]+/g, " ")
     .replace(/\s+/g, " ")
@@ -24,8 +25,7 @@ function prettySection(id){
     "_misc":"Misc"
   };
   if (m[id]) return m[id];
-
-  return (id || "")
+  return id
     .replace(/[_-]+/g, " ")
     .split(" ")
     .filter(Boolean)
@@ -33,80 +33,78 @@ function prettySection(id){
     .join(" ");
 }
 
-/* ---------------- Page transitions ---------------- */
+/* ---------- tags: if missing, derive from title/category ---------- */
+function deriveTags(item){
+  const base = `${item.title || ""} ${item.category || ""} ${item.file || ""}`;
+  const words = norm(base).split(" ").filter(Boolean);
+  // keep meaningful tokens only
+  const clean = words
+    .map(w => w.replace(/[^a-z0-9]+/g, ""))
+    .filter(w => w.length >= 3)
+    .slice(0, 12);
+  return Array.from(new Set(clean));
+}
+
+function getTagsText(item){
+  const t = Array.isArray(item.tags) ? item.tags : (item.tags ? [item.tags] : null);
+  const tags = t && t.length ? t : deriveTags(item);
+  return tags.join(" ");
+}
+
+/* ---------- Page transitions ---------- */
 function showPage(n){
-  const p1 = $("page1"), p2 = $("page2"), p3 = $("page3");
-  if(!p1 || !p2 || !p3){
-    console.error("Missing page containers: #page1/#page2/#page3");
-    return;
-  }
-  p1.classList.toggle("hidden", n !== 1);
-  p2.classList.toggle("hidden", n !== 2);
-  p3.classList.toggle("hidden", n !== 3);
+  $("page1").classList.toggle("hidden", n !== 1);
+  $("page2").classList.toggle("hidden", n !== 2);
+  $("page3").classList.toggle("hidden", n !== 3);
 }
 
 function setProgress(p){
-  const bar = $("barFill");
-  const pctEl = $("pct");
-  if(!bar || !pctEl) return;
-
   const pct = Math.max(0, Math.min(100, Math.round(p)));
-  bar.style.width = pct + "%";
-  pctEl.textContent = pct + "%";
+  $("barFill").style.width = pct + "%";
+  $("pct").textContent = pct + "%";
 }
 
-/* ---------------- Drawer ---------------- */
+/* ---------- Drawer ---------- */
 function openDrawer(){
-  const d = $("drawer");
-  if(!d) return;
-  d.classList.remove("hidden");
-  d.setAttribute("aria-hidden", "false");
+  $("drawer").classList.remove("hidden");
+  $("drawer").setAttribute("aria-hidden", "false");
 }
 function closeDrawer(){
-  const d = $("drawer");
-  if(!d) return;
-  d.classList.add("hidden");
-  d.setAttribute("aria-hidden", "true");
+  $("drawer").classList.add("hidden");
+  $("drawer").setAttribute("aria-hidden", "true");
 }
 
-/* ---------------- Modal ---------------- */
+/* ---------- Modal ---------- */
 function openModal(item){
-  const modal = $("modal");
-  const titleEl = $("modalTitle");
-  const img = $("modalImg");
-  const full = $("fullOpen");
-  if(!modal || !titleEl || !img || !full) return;
-
-  const title = `${prettySection(item.category)} • ${norm(item.title)}`;
-  titleEl.textContent = title;
+  const title = `${prettySection(item.category)} • ${item.title}`;
+  $("modalTitle").textContent = title;
 
   const src = "./" + item.file;
-  img.src = src;
-  img.alt = item.title || "poster";
-  full.href = src;
+  $("modalImg").src = src;
+  $("modalImg").alt = item.title;
+  $("fullOpen").href = src;
 
-  modal.classList.remove("hidden");
+  $("modal").classList.remove("hidden");
+  $("modal").setAttribute("aria-hidden","false");
 }
 function closeModal(){
-  const modal = $("modal");
-  const img = $("modalImg");
-  if(!modal) return;
-  modal.classList.add("hidden");
-  if(img) img.src = "";
+  $("modal").classList.add("hidden");
+  $("modal").setAttribute("aria-hidden","true");
+  $("modalImg").src = "";
 }
 
-/* ---------------- Data loading (Page 2 logic) ---------------- */
+/* ---------- Fetch helpers ---------- */
 async function fetchJSON(url){
   const r = await fetch(url, { cache: "no-store" });
-  if(!r.ok) throw new Error("Fetch failed: " + url + " (" + r.status + ")");
+  if(!r.ok) throw new Error("Fetch failed: " + url);
   return r.json();
 }
 
+/* ---------- Load flow (Page2) ---------- */
 async function loadAll(){
   showPage(2);
   setProgress(0);
 
-  // Fake smooth loading baseline while real fetch happens
   let fake = 0;
   const fakeTimer = setInterval(() => {
     fake = Math.min(fake + (fake < 70 ? 3 : 1), 88);
@@ -114,8 +112,10 @@ async function loadAll(){
   }, 80);
 
   const ts = Date.now();
-  const manifestURL = `./posters/manifest.json?ts=${ts}&v=${encodeURIComponent(state.ver)}`;
-  const dataURL     = `./data.json?ts=${ts}&v=${encodeURIComponent(state.ver)}`;
+  const v = encodeURIComponent(state.ver);
+
+  const manifestURL = `./posters/manifest.json?ts=${ts}&v=${v}`;
+  const dataURL = `./data.json?ts=${ts}&v=${v}`;
 
   try{
     const [manifest, data] = await Promise.all([
@@ -137,8 +137,7 @@ async function loadAll(){
   }catch(err){
     clearInterval(fakeTimer);
     setProgress(100);
-    console.error("Load error:", err);
-
+    console.error(err);
     setTimeout(() => {
       initLibraryUI(true);
       showPage(3);
@@ -146,7 +145,7 @@ async function loadAll(){
   }
 }
 
-/* ---------------- Library UI (Page 3) ---------------- */
+/* ---------- Library UI ---------- */
 function buildSections(items){
   const counts = new Map();
   for(const it of items){
@@ -159,11 +158,8 @@ function buildSections(items){
 
 function renderDrawer(sections){
   const host = $("sectionList");
-  if(!host) return;
-
   host.innerHTML = "";
 
-  // All Sections
   const allCount = (state.manifest?.items?.length || 0);
   const allBtn = document.createElement("button");
   allBtn.className = "secBtn" + (state.activeSection === "ALL" ? " active" : "");
@@ -189,20 +185,18 @@ function renderDrawer(sections){
 function selectSection(id){
   state.activeSection = id;
 
-  // Requirement: selecting section clears search
+  // requirement: selecting section clears search
   state.search = "";
-  const searchEl = $("search");
-  if(searchEl) searchEl.value = "";
+  $("search").value = "";
+  hideSuggest();
 
   renderDrawer(buildSections(state.manifest?.items || []));
-
   closeDrawer();
   applyFilters();
 }
 
 function renderGrid(items){
   const grid = $("grid");
-  if(!grid) return;
   grid.innerHTML = "";
 
   for(const it of items){
@@ -214,7 +208,7 @@ function renderGrid(items){
     img.className = "thumb";
     img.loading = "lazy";
     img.src = "./" + it.file;
-    img.alt = it.title || "poster";
+    img.alt = it.title;
 
     const meta = document.createElement("div");
     meta.className = "meta";
@@ -237,6 +231,17 @@ function renderGrid(items){
   }
 }
 
+function matchesQuery(it, q){
+  if(!q) return true;
+  const tags = getTagsText(it);
+  return (
+    norm(it.title).includes(q) ||
+    norm(it.file).includes(q) ||
+    norm(it.category).includes(q) ||
+    norm(tags).includes(q)
+  );
+}
+
 function applyFilters(){
   const all = state.manifest?.items || [];
   const q = norm(state.search);
@@ -245,98 +250,163 @@ function applyFilters(){
   const filtered = all.filter(it => {
     const inSection = (sec === "ALL") ? true : (it.category === sec);
     if(!inSection) return false;
-    if(!q) return true;
-    return norm(it.title).includes(q) || norm(it.file).includes(q) || norm(it.category).includes(q);
+    return matchesQuery(it, q);
   });
 
-  const heading = $("sectionHeading");
-  const countEl = $("sectionCount");
-
-  if(heading){
-    heading.textContent = (sec === "ALL") ? "All Sections" : prettySection(sec);
-  }
-  if(countEl){
-    countEl.textContent = `${filtered.length} poster(s)`;
-  }
+  $("sectionHeading").textContent = (sec === "ALL") ? "All Sections" : prettySection(sec);
+  $("sectionCount").textContent = `${filtered.length} poster(s)`;
 
   renderGrid(filtered);
-
-  const empty = $("empty");
-  if(empty){
-    empty.classList.toggle("hidden", filtered.length !== 0);
-  }
+  $("empty").classList.toggle("hidden", filtered.length !== 0);
 }
 
-function initLibraryUI(showError = false){
-  // Attach handlers safely
-  const menuBtn = $("menuBtn");
-  const closeBtn = $("closeDrawer");
-  const backdrop = $("drawerBackdrop");
+/* ---------- Search suggestions ---------- */
+const suggestBox = () => $("searchSuggest");
 
-  if(menuBtn) menuBtn.onclick = openDrawer;
-  if(closeBtn) closeBtn.onclick = closeDrawer;
-  if(backdrop) backdrop.onclick = closeDrawer;
+function hideSuggest(){
+  const box = suggestBox();
+  box.classList.add("hidden");
+  box.innerHTML = "";
+}
 
-  const modalClose = $("modalClose");
-  const modalBackdrop = $("modalBackdrop");
+function makeSuggestions(q){
+  const all = state.manifest?.items || [];
+  const query = norm(q);
+  if(!query || query.length < 2) return [];
 
-  if(modalClose) modalClose.onclick = closeModal;
-  if(modalBackdrop) modalBackdrop.onclick = closeModal;
+  const scored = all.map(it => {
+    const title = norm(it.title);
+    const cat = norm(it.category);
+    const file = norm(it.file);
+    const tags = norm(getTagsText(it));
 
-  document.addEventListener("keydown", (e) => {
-    if(e.key === "Escape"){ closeModal(); closeDrawer(); }
-  });
+    let score = 0;
+    if(title.includes(query)) score += 6;
+    if(tags.includes(query)) score += 5;
+    if(cat.includes(query)) score += 2;
+    if(file.includes(query)) score += 1;
 
-  const searchEl = $("search");
-  if(searchEl){
-    searchEl.addEventListener("input", () => {
-      state.search = searchEl.value;
-      applyFilters();
-    });
-  }
+    if(title.startsWith(query)) score += 3;
+    if(tags.startsWith(query)) score += 2;
 
-  const items = state.manifest?.items || [];
-  if(!items.length){
-    const heading = $("sectionHeading");
-    const countEl = $("sectionCount");
-    const empty = $("empty");
-    const grid = $("grid");
+    return { it, score };
+  }).filter(x => x.score > 0);
 
-    if(heading) heading.textContent = "Poster Library";
-    if(countEl) countEl.textContent = showError ? "manifest.json missing or failed to load" : "0 poster(s)";
-    if(empty){
-      empty.classList.remove("hidden");
-      empty.textContent = showError
-        ? "manifest.json missing/failed. Generate posters/manifest.json and push."
-        : "No posters found.";
-    }
-    if(grid) grid.innerHTML = "";
+  scored.sort((a,b) => b.score - a.score);
+  return scored.slice(0, 8).map(x => x.it);
+}
+
+function renderSuggest(list){
+  const box = suggestBox();
+  if(!list.length){
+    hideSuggest();
     return;
   }
 
-  const sections = buildSections(items);
-  renderDrawer(sections);
+  box.innerHTML = "";
+  list.forEach(it => {
+    const row = document.createElement("div");
+    row.className = "suggestItem";
 
+    const img = document.createElement("img");
+    img.className = "suggestThumb";
+    img.loading = "lazy";
+    img.src = "./" + it.file;
+    img.alt = it.title;
+
+    const text = document.createElement("div");
+    text.className = "suggestText";
+
+    const t = document.createElement("div");
+    t.className = "suggestTitle";
+    t.textContent = it.title;
+
+    const meta = document.createElement("div");
+    meta.className = "suggestMeta";
+
+    const tagsArr = (Array.isArray(it.tags) ? it.tags : deriveTags(it)).slice(0,3);
+    const tagsHTML = tagsArr.map(x => `<span class="suggestTag">${x}</span>`).join("");
+    meta.innerHTML = `${tagsHTML}${prettySection(it.category)}`;
+
+    text.appendChild(t);
+    text.appendChild(meta);
+
+    row.appendChild(img);
+    row.appendChild(text);
+
+    row.onclick = () => {
+      hideSuggest();
+      $("search").blur();
+      openModal(it);
+    };
+
+    box.appendChild(row);
+  });
+
+  box.classList.remove("hidden");
+}
+
+/* ---------- Init Page 3 ---------- */
+function initLibraryUI(showError=false){
+  $("menuBtn").onclick = openDrawer;
+  $("closeDrawer").onclick = closeDrawer;
+  $("drawerBackdrop").onclick = closeDrawer;
+
+  $("modalClose").onclick = closeModal;
+  $("modalBackdrop").onclick = closeModal;
+
+  document.addEventListener("keydown", (e) => {
+    if(e.key === "Escape"){ closeModal(); closeDrawer(); hideSuggest(); }
+  });
+
+  const items = state.manifest?.items || [];
+
+  if(!items.length){
+    $("sectionHeading").textContent = "Poster Library";
+    $("sectionCount").textContent = showError ? "manifest.json missing/failed" : "0 poster(s)";
+    $("empty").classList.remove("hidden");
+    $("empty").textContent = showError
+      ? "manifest.json missing/failed. Generate posters/manifest.json and push."
+      : "No posters found.";
+    $("grid").innerHTML = "";
+    return;
+  }
+
+  // Build drawer
+  renderDrawer(buildSections(items));
+
+  // Search input handlers
+  $("search").addEventListener("input", () => {
+    state.search = $("search").value;
+    applyFilters();
+
+    const list = makeSuggestions(state.search);
+    renderSuggest(list);
+  });
+
+  $("search").addEventListener("focus", () => {
+    const list = makeSuggestions($("search").value);
+    renderSuggest(list);
+  });
+
+  document.addEventListener("click", (e) => {
+    const box = suggestBox();
+    if(e.target && e.target.id === "search") return;
+    if(box.contains(e.target)) return;
+    hideSuggest();
+  });
+
+  // Default view
   state.activeSection = "ALL";
   state.search = "";
   applyFilters();
 }
 
-/* ---------------- Page 1 -> Page 2 -> Page 3 flow ---------------- */
+/* ---------- Page 1 -> 2 -> 3 ---------- */
 function initLanding(){
-  const btn = $("enterBtn");
-  if(!btn){
-    console.error("Missing #enterBtn on page1. Check index.html.");
-    return;
-  }
-
-  // Prevent double-attach
-  if(btn.dataset.bound === "1") return;
-  btn.dataset.bound = "1";
-
-  btn.addEventListener("click", () => {
-    btn.blur();
-    setTimeout(() => loadAll(), 120);
+  $("enterBtn").addEventListener("click", () => {
+    $("enterBtn").blur();
+    setTimeout(loadAll, 120);
   });
 }
 
@@ -345,7 +415,7 @@ function boot(){
   showPage(1);
 }
 
-// If DOM already loaded (because ui.js injected late), run immediately
+/* Fix: if JS loads after DOMContentLoaded */
 if (document.readyState === "loading") {
   document.addEventListener("DOMContentLoaded", boot);
 } else {

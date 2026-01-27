@@ -1,149 +1,159 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <meta name="theme-color" content="#070a14" />
   <title>Vet Library</title>
-  <meta name="theme-color" content="#06101d" />
 
-  <!-- BOOTSTRAP: cache-safe load CSS/JS using version.json -->
+  <!-- Fonts (readable + futuristic) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Cache-safe loader: reads version.json then loads CSS+JS with ?v= -->
   <script>
-    (async () => {
-      const bust = Date.now();
-      let v = bust;
-      try {
-        const r = await fetch('./version.json?ts=' + bust, { cache: 'no-store' });
-        if (r.ok) {
-          const j = await r.json();
-          if (j && (j.v || j.v === 0)) v = j.v;
-        }
-      } catch (e) {}
+    (function () {
+      const fallbackV = Date.now();
+      function inject(v){
+        window.__VER__ = v;
 
-      // Inject CSS
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
-      link.href = './assets/style.css?v=' + encodeURIComponent(v);
-      document.head.appendChild(link);
+        const css = document.createElement("link");
+        css.rel = "stylesheet";
+        css.href = "assets/style.css?v=" + encodeURIComponent(v);
+        document.head.appendChild(css);
 
-      // Inject JS
-      const s = document.createElement('script');
-      s.src = './assets/ui.js?v=' + encodeURIComponent(v);
-      s.defer = true;
-      document.head.appendChild(s);
+        const js = document.createElement("script");
+        js.src = "assets/ui.js?v=" + encodeURIComponent(v);
+        js.defer = true;
+        document.head.appendChild(js);
+      }
 
-      // expose version for ui.js
-      window.__VER__ = v;
+      fetch("version.json?ts=" + Date.now(), { cache: "no-store" })
+        .then(r => r.ok ? r.json() : ({ v: fallbackV }))
+        .then(j => inject(j.v ?? fallbackV))
+        .catch(() => inject(fallbackV));
     })();
   </script>
 </head>
 
 <body>
-  <!-- ✅ PAGE 1 — LANDING / WELCOME -->
-  <section id="page1" class="page page1">
-    <div class="bg">
-      <div class="glow glowTL"></div>
-      <div class="glow glowBR"></div>
-      <div class="grid"></div>
-      <div class="scanlines"></div>
-      <div class="vignette"></div>
-    </div>
+  <!-- Ambient background layers -->
+  <div class="bg">
+    <div class="glow glow-cyan"></div>
+    <div class="glow glow-mag"></div>
+    <div class="gridOverlay"></div>
+    <div class="scanlines"></div>
+    <div class="vignette"></div>
+  </div>
 
-    <div class="hero">
-      <div class="badge">VET KNOWLEDGE NODE</div>
+  <!-- PAGE 1: LANDING -->
+  <main id="page1" class="page">
+    <section class="centerWrap">
+      <div class="heroCard riseIn">
+        <div class="badge">VET KNOWLEDGE NODE</div>
 
-      <h1 class="title rise">VET LIBRARY</h1>
-      <div class="subtitle rise">INFOGRAPHICS DIRECTORY</div>
-      <div class="by rise">Designed by <span>AM</span></div>
+        <h1 class="heroTitle">VET LIBRARY</h1>
+        <div class="heroSub">INFOGRAPHICS DIRECTORY</div>
+        <div class="heroBy">Designed by <span class="accent">AM</span></div>
 
-      <button id="enterBtn" class="btn3d rise" type="button">
-        Tap to Enter Library
-      </button>
+        <button id="enterBtn" class="enterBtn" type="button">
+          Tap to Enter Library
+        </button>
 
-      <div class="hint">Mobile-first • Search • Organ/System-wise</div>
-    </div>
-  </section>
-
-  <!-- ✅ PAGE 2 — LOADING / INITIALIZING -->
-  <section id="page2" class="page page2 hidden">
-    <div class="bg">
-      <div class="glow glowTL"></div>
-      <div class="glow glowBR"></div>
-      <div class="grid"></div>
-      <div class="scanlines"></div>
-      <div class="vignette"></div>
-    </div>
-
-    <div class="loaderPanel">
-      <div class="loaderTitle">Initializing Vet Library…</div>
-
-      <div class="barWrap">
-        <div id="barFill" class="barFill" style="width:0%"></div>
+        <div class="heroHint">Mobile-first • Search • Organ/System-wise</div>
       </div>
+    </section>
+  </main>
 
-      <div id="pct" class="pct">0%</div>
+  <!-- PAGE 2: LOADING -->
+  <main id="page2" class="page hidden">
+    <section class="centerWrap">
+      <div class="loaderCard">
+        <div class="loaderTitle">Initializing Vet Library…</div>
 
-      <div class="pulseWrap">
-        <div class="pulseLine"></div>
+        <div class="progressRow">
+          <div class="progressTrack">
+            <div id="barFill" class="progressFill"></div>
+          </div>
+          <div id="pct" class="pct">0%</div>
+        </div>
+
+        <div class="pulseLine">
+          <span class="pulseDot"></span>
+        </div>
+
+        <div class="loaderMeta">Loading posters + UI modules (cache-safe)…</div>
       </div>
-    </div>
-  </section>
+    </section>
+  </main>
 
-  <!-- ✅ PAGE 3 — LIBRARY / MAIN APP -->
-  <section id="page3" class="page page3 hidden">
+  <!-- PAGE 3: LIBRARY -->
+  <main id="page3" class="page hidden">
     <!-- Topbar -->
     <header class="topbar">
-      <button id="menuBtn" class="iconBtn" type="button" aria-label="Open menu">☰</button>
+      <button id="menuBtn" class="iconBtn" aria-label="Open menu" type="button">☰</button>
 
-      <div class="brandStack">
-        <div class="brand1">Vet Library</div>
-        <div class="brand2">Infographics</div>
+      <div class="brand">
+        <div class="brandTitle">Vet Library</div>
+        <div class="brandSub">Infographics</div>
       </div>
 
       <div class="searchWrap">
-        <input id="search" class="search" type="search" placeholder="Search any disease/keyword…" autocomplete="off" />
+        <input id="search" class="searchInput" type="search" autocomplete="off"
+               placeholder="Search any disease/keyword…" />
+        <div id="searchSuggest" class="suggest hidden"></div>
       </div>
     </header>
 
+    <!-- Content -->
+    <section class="content">
+      <div class="sectionHead">
+        <div>
+          <div id="sectionHeading" class="sectionTitle">All Sections</div>
+          <div id="sectionCount" class="sectionCount">0 poster(s)</div>
+        </div>
+      </div>
+
+      <div id="grid" class="grid"></div>
+      <div id="empty" class="empty hidden">No posters found.</div>
+    </section>
+
     <!-- Drawer -->
     <aside id="drawer" class="drawer hidden" aria-hidden="true">
+      <div id="drawerBackdrop" class="drawerBackdrop"></div>
+
       <div class="drawerPanel">
-        <div class="drawerHead">
+        <div class="drawerTop">
           <div class="drawerTitle">Sections</div>
-          <button id="closeDrawer" class="iconBtn" type="button" aria-label="Close menu">✕</button>
+          <button id="closeDrawer" class="iconBtn" aria-label="Close menu" type="button">✕</button>
         </div>
 
         <div id="sectionList" class="sectionList"></div>
+
+        <div class="drawerFooter">
+          <div class="small">Tip: selecting a section clears search.</div>
+        </div>
       </div>
-      <div id="drawerBackdrop" class="drawerBackdrop"></div>
     </aside>
 
-    <!-- Main content -->
-    <main class="main">
-      <div class="mainHead">
-        <div id="sectionHeading" class="sectionHeading">All Sections</div>
-        <div id="sectionCount" class="sectionCount">—</div>
-      </div>
+    <!-- Modal -->
+    <div id="modal" class="modal hidden" aria-hidden="true">
+      <div id="modalBackdrop" class="modalBackdrop"></div>
 
-      <div id="grid" class="cardsGrid"></div>
-      <div id="empty" class="empty hidden">No posters found.</div>
-    </main>
-  </section>
+      <div class="modalPanel">
+        <div class="modalTop">
+          <div id="modalTitle" class="modalTitle">Poster</div>
+          <button id="modalClose" class="iconBtn" aria-label="Close poster" type="button">✕</button>
+        </div>
 
-  <!-- Modal Viewer -->
-  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
-    <div class="modalCard">
-      <div class="modalHead">
-        <div id="modalTitle" class="modalTitle">Poster</div>
-        <button id="modalClose" class="iconBtn" type="button" aria-label="Close">✕</button>
-      </div>
-      <div class="modalBody">
-        <img id="modalImg" alt="" />
-      </div>
-      <div class="modalFoot">
-        <a id="fullOpen" class="linkBtn" target="_blank" rel="noopener">Open Full Image</a>
+        <img id="modalImg" class="modalImg" alt="" />
+
+        <div class="modalBottom">
+          <a id="fullOpen" class="linkBtn" href="#" target="_blank" rel="noreferrer">Open Full Image</a>
+        </div>
       </div>
     </div>
-    <div id="modalBackdrop" class="modalBackdrop"></div>
-  </div>
+  </main>
 </body>
 </html>

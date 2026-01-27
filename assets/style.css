@@ -279,7 +279,7 @@ body{
   border-radius: 12px;
   border: 1px solid rgba(255,255,255,.10);
   background: rgba(10, 14, 28, .55);
-  color: rgba(234,246,255,.92);
+  color: rgba(234,246,255,.95);
   font-weight: 900;
   cursor:pointer;
 }
@@ -290,7 +290,7 @@ body{
   min-width: 120px;
 }
 .brandTitle{ font-weight: 800; font-size: 14px; }
-.brandSub{ font-size: 12px; color: rgba(234,246,255,.66); }
+.brandSub{ font-size: 12px; color: rgba(234,246,255,.70); }
 
 .searchWrap{
   margin-left:auto;
@@ -303,11 +303,11 @@ body{
   border-radius: 14px;
   border: 1px solid rgba(255,255,255,.10);
   background: rgba(10, 14, 28, .55);
-  color: rgba(234,246,255,.92);
+  color: rgba(234,246,255,.95);
   padding: 0 14px;
   outline: none;
 }
-.searchInput::placeholder{ color: rgba(234,246,255,.45); }
+.searchInput::placeholder{ color: rgba(234,246,255,.55); }
 
 /* Content */
 .content{
@@ -328,7 +328,7 @@ body{
 }
 .sectionCount{
   font-size: 12px;
-  color: rgba(234,246,255,.66);
+  color: rgba(234,246,255,.72);
   margin-top: 4px;
 }
 
@@ -373,13 +373,13 @@ body{
   font-weight: 800;
   font-size: 13px;
   line-height: 1.15;
-  color: rgba(234,246,255,.92);
+  color: rgba(234,246,255,.95);
   text-transform: lowercase;
 }
 .metaSub{
   margin-top: 6px;
   font-size: 12px;
-  color: rgba(234,246,255,.66);
+  color: rgba(234,246,255,.75);
 }
 
 /* Empty */
@@ -389,7 +389,7 @@ body{
   border-radius: 16px;
   background: rgba(10,14,28,.55);
   border: 1px dashed rgba(255,255,255,.18);
-  color: rgba(234,246,255,.72);
+  color: rgba(234,246,255,.80);
 }
 
 /* Drawer */
@@ -410,12 +410,15 @@ body{
   height:100%;
   width: min(360px, 82vw);
   padding: calc(12px + var(--safeT)) 12px 12px;
-  background: rgba(8, 12, 22, .92);
+  background: rgba(8, 12, 22, .94);
   border-right: 1px solid rgba(255,255,255,.10);
   backdrop-filter: blur(10px);
   box-shadow: 18px 0 60px rgba(0,0,0,.55);
   display:flex;
   flex-direction:column;
+
+  /* ✅ FORCE readable text in drawer */
+  color: #ffffff;
 }
 .drawerTop{
   display:flex;
@@ -427,6 +430,9 @@ body{
 .drawerTitle{
   font-weight: 900;
   font-size: 16px;
+
+  /* ✅ pure white */
+  color: #ffffff;
 }
 .sectionList{
   display:flex;
@@ -438,24 +444,40 @@ body{
 .secBtn{
   text-align:left;
   border-radius: 16px;
-  border: 1px solid rgba(255,255,255,.10);
-  background: rgba(10,14,28,.55);
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(10,14,28,.60);
   padding: 10px 12px;
   cursor:pointer;
   transition: border-color .12s ease, background .12s ease;
+
+  /* ✅ ensure button text is white */
+  color: #ffffff;
 }
-.secBtn:hover{ border-color: rgba(70,247,255,.18); }
+.secBtn:hover{ border-color: rgba(70,247,255,.22); }
 .secBtn.active{
-  border-color: rgba(70,247,255,.30);
-  box-shadow: 0 0 0 1px rgba(70,247,255,.10) inset;
-  background: rgba(70,247,255,.06);
+  border-color: rgba(70,247,255,.34);
+  box-shadow: 0 0 0 1px rgba(70,247,255,.12) inset;
+  background: rgba(70,247,255,.08);
 }
-.secLabel{ font-weight: 900; }
-.secCount{ font-size: 12px; color: rgba(234,246,255,.66); margin-top: 4px; }
+.secLabel{
+  font-weight: 900;
+
+  /* ✅ white + high contrast */
+  color: #ffffff;
+}
+.secCount{
+  font-size: 12px;
+
+  /* ✅ bright readable (not dull) */
+  color: rgba(255,255,255,.88);
+  margin-top: 4px;
+}
 .drawerFooter{
   margin-top:auto;
   padding: 10px 6px;
-  color: rgba(234,246,255,.55);
+
+  /* ✅ readable footer */
+  color: rgba(255,255,255,.80);
   font-size: 12px;
 }
 
@@ -496,7 +518,7 @@ body{
 .modalTitle{
   font-weight: 900;
   font-size: 14px;
-  color: rgba(234,246,255,.92);
+  color: rgba(234,246,255,.95);
   overflow:hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -518,7 +540,7 @@ body{
   border-radius: 14px;
   border: 1px solid rgba(70,247,255,.18);
   background: rgba(70,247,255,.06);
-  color: rgba(234,246,255,.92);
+  color: rgba(234,246,255,.95);
   text-decoration:none;
   font-weight: 800;
 }
@@ -560,11 +582,11 @@ body{
 .suggestTitle{
   font-weight: 800;
   font-size: 13px;
-  color: #eaf6ff;
+  color: #ffffff;
 }
 .suggestMeta{
   font-size: 11px;
-  opacity: .75;
+  opacity: .82;
   margin-top: 3px;
 }
 .suggestTag{
@@ -575,24 +597,4 @@ body{
   margin-right: 6px;
   background: rgba(184, 75, 255, .14);
   border: 1px solid rgba(184, 75, 255, .22);
-}
-/* ===== Drawer: force readable white text ===== */
-.drawer,
-.drawer *{
-  color: rgba(255,255,255,.92) !important;
-}
-
-.secBtn .secLabel{
-  color: rgba(255,255,255,.95) !important;
-  font-weight: 800;
-  letter-spacing: .2px;
-}
-
-.secBtn .secCount{
-  color: rgba(255,255,255,.72) !important;
-}
-
-.secBtn.active{
-  border-color: rgba(80, 240, 255, .55) !important;
-  box-shadow: 0 0 0 1px rgba(80,240,255,.20), 0 10px 30px rgba(0,0,0,.45) !important;
 }
