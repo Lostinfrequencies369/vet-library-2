@@ -9,6 +9,7 @@
   --muted: rgba(234, 246, 255, .72);
   --shadow: 0 18px 60px rgba(0,0,0,.55);
 
+  /* Keep these vars for compatibility */
   --safeT: env(safe-area-inset-top, 0px);
   --safeR: env(safe-area-inset-right, 0px);
   --safeB: env(safe-area-inset-bottom, 0px);
@@ -20,12 +21,14 @@
 *{ box-sizing:border-box; }
 html,body{ height:100%; }
 
+/* ✅ Safe reveal: index.html reveals on CSS load; this ensures it stays visible */
 body{
   margin:0;
   background: var(--bg0);
   color: var(--text);
   font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
   overflow:hidden;
+  visibility: visible;
 }
 
 /* ---------------- Background layers ---------------- */
@@ -33,7 +36,7 @@ body{
   position:fixed;
   inset:0;
   pointer-events:none;
-  z-index:0; /* ✅ FIX: keep bg behind pages */
+  z-index:0; /* keep bg behind pages */
   background: radial-gradient(1200px 800px at 25% 15%, rgba(70,247,255,.18), transparent 55%),
               radial-gradient(1200px 900px at 85% 75%, rgba(184,75,255,.18), transparent 55%),
               linear-gradient(180deg, var(--bg0), var(--bg1));
@@ -83,10 +86,19 @@ body{
 .page{
   position:relative;
   inset:0;
-  z-index:1; /* ✅ FIX: bring content above background */
+  z-index:1; /* bring content above background */
   height:100%;
   width:100%;
-  padding: calc(18px + var(--safeT)) calc(18px + var(--safeR)) calc(18px + var(--safeB)) calc(18px + var(--safeL));
+
+  /* ✅ Mobile-stable safe-area padding */
+  padding: 18px;
+  padding-top: calc(18px + max(env(safe-area-inset-top, 0px), 0px));
+  padding-right: calc(18px + max(env(safe-area-inset-right, 0px), 0px));
+  padding-bottom: calc(18px + max(env(safe-area-inset-bottom, 0px), 0px));
+  padding-left: calc(18px + max(env(safe-area-inset-left, 0px), 0px));
+
+  /* Optional: reduces address-bar jump on modern mobiles */
+  min-height: 100svh;
 }
 .hidden{ display:none !important; }
 
@@ -258,15 +270,21 @@ body{
 }
 
 /* ---------------- Topbar ---------------- */
+/* ✅ FIX: mobile-safe padding; prevents “disoriented” header on Chrome */
 .topbar{
-  height: var(--topbarH);
+  min-height: var(--topbarH);
+  height: auto;
   display:flex;
   align-items:center;
   gap: 12px;
-  padding: calc(10px + var(--safeT)) 12px 10px;
+
+  padding: 10px 12px;
+  padding-top: max(10px, env(safe-area-inset-top, 0px));
+
   position: sticky;
   top: 0;
   z-index: 20;
+
   background: linear-gradient(180deg, rgba(7,10,20,.92), rgba(7,10,20,.60));
   backdrop-filter: blur(10px);
   border-bottom: 1px solid rgba(255,255,255,.08);
@@ -409,13 +427,22 @@ body{
   top:0;
   height:100%;
   width: min(360px, 82vw);
-  padding: calc(12px + var(--safeT)) 12px 12px;
+
+  /* ✅ FIX: safe-area stable on mobile */
+  padding: 12px;
+  padding-top: max(12px, env(safe-area-inset-top, 0px));
+  padding-right: calc(12px + max(env(safe-area-inset-right, 0px), 0px));
+  padding-bottom: calc(12px + max(env(safe-area-inset-bottom, 0px), 0px));
+  padding-left: calc(12px + max(env(safe-area-inset-left, 0px), 0px));
+
   background: rgba(8, 12, 22, .94);
   border-right: 1px solid rgba(255,255,255,.10);
   backdrop-filter: blur(10px);
   box-shadow: 18px 0 60px rgba(0,0,0,.55);
   display:flex;
   flex-direction:column;
+
+  /* ✅ Drawer fonts pure white readable */
   color:#fff;
 }
 
@@ -446,6 +473,8 @@ body{
   padding: 10px 12px;
   cursor:pointer;
   transition: border-color .12s ease, background .12s ease;
+
+  /* ✅ white text */
   color:#fff;
 }
 .secBtn *{ color:#fff; } /* extra safety */

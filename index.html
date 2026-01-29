@@ -11,16 +11,28 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
+  <!-- FIX: prevent white flash / FOUC before CSS inject -->
+  <style>
+    html, body { background: #070a14; }
+    body { visibility: hidden; }
+  </style>
+
   <!-- Cache-safe loader: reads version.json then loads CSS+JS with ?v= -->
   <script>
     (function () {
       const fallbackV = Date.now();
+
       function inject(v){
         window.__VER__ = v;
 
         const css = document.createElement("link");
         css.rel = "stylesheet";
         css.href = "assets/style.css?v=" + encodeURIComponent(v);
+
+        /* FIX: reveal only after CSS actually loads */
+        css.addEventListener("load", () => { document.body.style.visibility = "visible"; });
+        css.addEventListener("error", () => { document.body.style.visibility = "visible"; });
+
         document.head.appendChild(css);
 
         const js = document.createElement("script");
