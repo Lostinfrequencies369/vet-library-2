@@ -21,6 +21,23 @@
 *{ box-sizing:border-box; }
 html,body{ height:100%; }
 
+/* ✅ GLOBAL FIX: Remove tap highlight rectangle from ALL elements */
+*{
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+button, a, input, [role="button"], [onclick]{
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  outline: none;
+  user-select: none;
+}
+
+button:focus, a:focus, input:focus{
+  outline: none;
+}
+
 /* ✅ Safe reveal: index.html reveals on CSS load; this ensures it stays visible */
 body{
   margin:0;
