@@ -210,15 +210,18 @@ body{
   cursor:pointer;
   box-shadow: 0 18px 45px rgba(0,0,0,.50);
   transform: translateZ(0);
-  transition: transform .08s ease, box-shadow .12s ease, filter .12s ease, background .12s ease, border-color .12s ease;
+  transition: transform .1s ease, box-shadow .15s ease, filter .15s ease, background .15s ease, border-color .15s ease;
 }
-.enterBtn:active{
-  transform: translateY(2px);
-  box-shadow: 0 10px 28px rgba(0,0,0,.45);
-  background: linear-gradient(180deg, rgba(70, 247, 255, .25), rgba(70, 247, 255, .15));
-  border-color: rgba(70, 247, 255, .45);
-  filter: brightness(1.15);
+/* ✅ enterBtn: CSS :active + .pressed both trigger same style */
+.enterBtn:active,
+.enterBtn.pressed{
+  transform: scale(0.96);
+  box-shadow: 0 8px 22px rgba(0,0,0,.45);
+  background: linear-gradient(180deg, rgba(70, 247, 255, .22), rgba(70, 247, 255, .12));
+  border-color: rgba(70, 247, 255, .50);
+  filter: brightness(1.2);
 }
+
 .heroHint{
   margin-top: 14px;
   font-size: 12px;
@@ -335,13 +338,16 @@ body{
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  transition: all .12s ease;
+  transition: transform .1s ease, background .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease;
 }
-.iconBtn:active{
-  transform: scale(0.95);
-  background: rgba(70, 247, 255, .18);
-  border-color: rgba(70, 247, 255, .35);
+/* ✅ iconBtn: CSS :active + .pressed both */
+.iconBtn:active,
+.iconBtn.pressed{
+  transform: scale(0.88);
+  background: rgba(70, 247, 255, .20);
+  border-color: rgba(70, 247, 255, .45);
   color: rgba(70, 247, 255, 1);
+  box-shadow: 0 0 12px rgba(70, 247, 255, .20);
 }
 
 .brand{
@@ -448,8 +454,13 @@ body{
   padding: 0 14px;
   outline: none;
   font-size: 14px;
+  transition: border-color .15s ease, box-shadow .15s ease;
 }
 .searchInput::placeholder{ color: rgba(255,255,255,.55); }
+.searchInput:focus{
+  border-color: rgba(70, 247, 255, .35);
+  box-shadow: 0 0 0 2px rgba(70, 247, 255, .10);
+}
 
 /* ---------------- Content ---------------- */
 .content{
@@ -497,17 +508,21 @@ body{
   border: 1px solid rgba(255,255,255,.10);
   box-shadow: 0 12px 40px rgba(0,0,0,.35);
   cursor:pointer;
-  transition: transform .12s ease, border-color .12s ease, filter .12s ease, background .12s ease;
+  transition: transform .1s ease, border-color .15s ease, filter .15s ease, background .15s ease, box-shadow .15s ease;
 }
 .card:hover{
   transform: translateY(-2px);
   border-color: rgba(70,247,255,.18);
   filter: brightness(1.03);
 }
-.card:active{
-  transform: scale(0.98);
+/* ✅ card: CSS :active + .pressed both */
+.card:active,
+.card.pressed{
+  transform: scale(0.96);
   background: rgba(70, 247, 255, .08);
-  border-color: rgba(70, 247, 255, .35);
+  border-color: rgba(70, 247, 255, .40);
+  box-shadow: 0 0 16px rgba(70, 247, 255, .12), 0 6px 20px rgba(0,0,0,.35);
+  filter: brightness(1.08);
 }
 .thumb{
   width:100%;
@@ -603,16 +618,20 @@ body{
   background: rgba(10,14,28,.60);
   padding: 10px 12px;
   cursor:pointer;
-  transition: border-color .12s ease, background .12s ease;
+  transition: transform .1s ease, border-color .15s ease, background .15s ease, box-shadow .15s ease;
 
   /* ✅ white text */
   color:#fff;
 }
 .secBtn *{ color:#fff; } /* extra safety */
 .secBtn:hover{ border-color: rgba(70,247,255,.22); }
-.secBtn:active{
-  background: rgba(70, 247, 255, .15);
-  border-color: rgba(70, 247, 255, .40);
+/* ✅ secBtn: CSS :active + .pressed both */
+.secBtn:active,
+.secBtn.pressed{
+  transform: scale(0.97);
+  background: rgba(70, 247, 255, .18);
+  border-color: rgba(70, 247, 255, .45);
+  box-shadow: 0 0 10px rgba(70, 247, 255, .15);
 }
 .secBtn.active{
   border-color: rgba(70,247,255,.34);
@@ -694,12 +713,15 @@ body{
   color: rgba(255,255,255,.95);
   text-decoration:none;
   font-weight: 800;
-  transition: all .12s ease;
+  transition: transform .1s ease, background .15s ease, border-color .15s ease, box-shadow .15s ease;
 }
-.linkBtn:active{
-  background: rgba(70,247,255,.20);
-  border-color: rgba(70,247,255,.45);
-  transform: scale(0.97);
+/* ✅ linkBtn: CSS :active + .pressed both */
+.linkBtn:active,
+.linkBtn.pressed{
+  transform: scale(0.95);
+  background: rgba(70,247,255,.22);
+  border-color: rgba(70,247,255,.50);
+  box-shadow: 0 0 12px rgba(70, 247, 255, .18);
 }
 
 /* ---------------- Search suggestions dropdown ---------------- */
@@ -725,9 +747,16 @@ body{
   align-items:center;
   cursor:pointer;
   border-bottom: 1px solid rgba(255,255,255,.06);
+  transition: transform .1s ease, background .15s ease;
 }
 .suggestItem:last-child{ border-bottom:none; }
 .suggestItem:hover{ background: rgba(70, 247, 255, .08); }
+/* ✅ suggestItem: CSS :active + .pressed both */
+.suggestItem:active,
+.suggestItem.pressed{
+  transform: scale(0.97);
+  background: rgba(70, 247, 255, .16);
+}
 .suggestThumb{
   width: 46px;
   height: 34px;

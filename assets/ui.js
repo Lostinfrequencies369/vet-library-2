@@ -8,6 +8,74 @@ const state = {
   search: ""
 };
 
+/* ============================================================
+   ✅ TOUCH FEEDBACK SYSTEM
+   Adds .pressed class on touchstart → instant visual feedback
+   Removes on touchend/touchcancel/mouseleave
+   Works on ALL interactive elements, no browser delay
+   ============================================================ */
+(function initTouchFeedback(){
+  // All selectors that should get instant press feedback
+  const PRESS_SELECTORS = [
+    ".enterBtn",
+    ".iconBtn",
+    ".card",
+    ".secBtn",
+    ".linkBtn",
+    ".suggestItem"
+  ].join(",");
+
+  function addPressed(e){
+    const el = e.target.closest(PRESS_SELECTORS);
+    if(!el) return;
+    el.classList.add("pressed");
+  }
+
+  function removePressed(e){
+    const el = e.target.closest(PRESS_SELECTORS);
+    if(el){
+      el.classList.remove("pressed");
+      return;
+    }
+    // Fallback: remove .pressed from ALL currently pressed elements
+    document.querySelectorAll(".pressed").forEach(p => p.classList.remove("pressed"));
+  }
+
+  function removeAllPressed(){
+    document.querySelectorAll(".pressed").forEach(p => p.classList.remove("pressed"));
+  }
+
+  // Touch events (mobile) — instant, no delay
+  document.addEventListener("touchstart", addPressed, { passive: true });
+  document.addEventListener("touchend", (e) => {
+    // Small delay so user can see the feedback before it disappears
+    setTimeout(() => removePressed(e), 120);
+  }, { passive: true });
+  document.addEventListener("touchcancel", removeAllPressed, { passive: true });
+
+  // Mouse events (desktop fallback)
+  document.addEventListener("mousedown", addPressed);
+  document.addEventListener("mouseup", (e) => {
+    setTimeout(() => removePressed(e), 120);
+  });
+  document.addEventListener("mouseleave", removeAllPressed);
+
+  // Safety: if finger/mouse leaves the element
+  document.addEventListener("touchmove", (e) => {
+    // Check if touch moved outside the pressed element
+    const touch = e.touches[0];
+    if(!touch) return;
+    const el = document.elementFromPoint(touch.clientX, touch.clientY);
+    if(!el || !el.closest(PRESS_SELECTORS)){
+      removeAllPressed();
+    }
+  }, { passive: true });
+
+  // Extra safety: scroll starts → remove all pressed states
+  document.addEventListener("scroll", removeAllPressed, { passive: true, capture: true });
+})();
+
+
 function norm(s){
   return (s || "")
     .toString()
