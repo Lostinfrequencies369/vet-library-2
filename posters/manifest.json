@@ -1,22 +1,72 @@
 ﻿{
-  "generated": "2026-01-27T20:17:57",
-  "count": 3,
+  "generated": "2026-01-31T16:30:00",
+  "count": 4,
   "items": [
     {
+      "title": "macrocyclic-lactones-avermectins-milbemycins",
       "category": "skin",
       "file": "posters/skin/macrocyclic-lactones-avermectins-milbemycins.jpg",
-      "title": "macrocyclic-lactones-avermectins-milbemycins"
+      "tags": [
+        "macrocyclic lactones",
+        "avermectins",
+        "milbemycins",
+        "ivermectin",
+        "moxidectin",
+        "selamectin",
+        "ectoparasites",
+        "endoparasites",
+        "skin parasites",
+        "veterinary pharmacology",
+        "antiparasitic drugs"
+      ]
     },
     {
+      "title": "zinc-responsive-dermatosis",
       "category": "skin",
       "file": "posters/skin/zinc-responsive-dermatosis.jpg",
-      "title": "zinc-responsive-dermatosis"
+      "tags": [
+        "zinc responsive dermatosis",
+        "zinc deficiency",
+        "skin lesions",
+        "crusting dermatitis",
+        "parakeratosis",
+        "canine skin disease",
+        "nutritional deficiency",
+        "veterinary dermatology"
+      ]
     },
     {
       "title": "Respiratory Acidosis and Alkalosis",
       "category": "respiratory",
       "file": "posters/respiratory/Respiratory-acidosis-alkalosis.jpg",
-      "tags": ["respiratory", "acidosis", "alkalosis"]
+      "tags": [
+        "respiratory acidosis",
+        "respiratory alkalosis",
+        "acid base balance",
+        "carbon dioxide",
+        "hypoventilation",
+        "hyperventilation",
+        "blood ph",
+        "respiratory physiology",
+        "clinical pathology"
+      ]
+    },
+    {
+      "title": "Respiration, Acid–Base Balance and Eggshell Quality",
+      "category": "poultry",
+      "file": "posters/poultry/respiration-acid-base-balance-eggshell-quality.jpg",
+      "tags": [
+        "respiration",
+        "acid base balance",
+        "eggshell quality",
+        "poultry",
+        "heat stress",
+        "panting",
+        "thin eggshell",
+        "soft shell eggs",
+        "calcium metabolism",
+        "poultry physiology"
+      ]
     }
   ]
 }
