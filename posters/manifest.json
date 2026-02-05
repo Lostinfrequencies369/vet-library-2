@@ -1,6 +1,6 @@
 ﻿{
-  "generated": "2026-01-31T16:30:00",
-  "count": 4,
+  "generated": "2026-02-05T13:45:00",
+  "count": 5,
   "items": [
     {
       "title": "macrocyclic-lactones-avermectins-milbemycins",
@@ -66,6 +66,29 @@
         "soft shell eggs",
         "calcium metabolism",
         "poultry physiology"
+      ]
+    },
+    {
+      "title": "Vomiting Reflex in Dogs and Cats",
+      "category": "gastrointestinal",
+      "file": "posters/gastrointestinal/vomiting-reflex-dogs-cats.jpg",
+      "tags": [
+        "vomiting reflex",
+        "dogs vomiting",
+        "cats vomiting",
+        "emetic center",
+        "crtz",
+        "chemoreceptor trigger zone",
+        "canine vomiting",
+        "feline vomiting",
+        "antiemetic drugs",
+        "metoclopramide",
+        "maropitant",
+        "ondansetron",
+        "apomorphine",
+        "xylazine",
+        "veterinary physiology",
+        "vomition pathway"
       ]
     }
   ]
